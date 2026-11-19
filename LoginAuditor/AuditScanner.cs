@@ -25,7 +25,7 @@ namespace LoginAuditor
         public RecordKind Kind = RecordKind.Normal;
 
         public string TimeText => Time.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-        public string StatusText => Success ? "成功" : "失敗";
+        public string StatusText => Success ? Lang.T("成功", "Success") : Lang.T("失敗", "Failure");
     }
 
     internal readonly struct ScanProgress
@@ -67,14 +67,18 @@ namespace LoginAuditor
 
         private static readonly Dictionary<string, string> LogonTypeNames = new Dictionary<string, string>(StringComparer.Ordinal)
         {
-            ["2"] = "本機登入",
-            ["3"] = "網路共用",
-            ["4"] = "批次作業",
-            ["5"] = "服務啟動",
-            ["7"] = "解鎖",
-            ["10"] = "遠端桌面(RDP)",
-            ["11"] = "快取",
+            ["2"] = Lang.T("本機登入", "Interactive"),
+            ["3"] = Lang.T("網路共用", "Network"),
+            ["4"] = Lang.T("批次作業", "Batch"),
+            ["5"] = Lang.T("服務啟動", "Service"),
+            ["7"] = Lang.T("解鎖", "Unlock"),
+            ["10"] = Lang.T("遠端桌面(RDP)", "Remote Desktop (RDP)"),
+            ["11"] = Lang.T("快取", "Cached"),
         };
+
+        private static readonly string OtherType = Lang.T("其他", "Other");
+        private static readonly string FailNote = Lang.T("登入失敗", "Logon failed");
+        private static readonly string RareNote = Lang.T("少數帳號 (異常?)", "Rare account (suspicious?)");
 
         /// <summary>
         /// 讀取 Security 記錄檔中指定區間 (本地時間, 含頭含尾) 的 4624/4625 事件。
@@ -191,7 +195,7 @@ namespace LoginAuditor
             string typeName;
             if (!LogonTypeNames.TryGetValue(code, out typeName))
             {
-                typeName = "其他";
+                typeName = OtherType;
             }
 
             return new LogonRecord
@@ -232,12 +236,12 @@ namespace LoginAuditor
                 if (!r.Success)
                 {
                     r.Kind = RecordKind.Fail;
-                    r.Note = "登入失敗";
+                    r.Note = FailNote;
                 }
                 else if (counts[r.Account] <= threshold)
                 {
                     r.Kind = RecordKind.Rare;
-                    r.Note = "少數帳號 (異常?)";
+                    r.Note = RareNote;
                 }
             }
         }

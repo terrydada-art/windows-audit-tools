@@ -80,7 +80,12 @@ namespace PowerEventViewer
         private const int ProgressInterval = 500;
         private const int MaxDetailLength = 4000;
         private const int MaxSourceLength = 128;
-        private const string NoDetail = "無可顯示的詳細事件內容";
+        private static readonly string NoDetail = Lang.T("無可顯示的詳細事件內容", "No event details available");
+        private static readonly string BootName = Lang.T("開機", "Boot");
+        private static readonly string ShutdownName = Lang.T("關機", "Shutdown");
+        private static readonly string SleepName = Lang.T("睡眠", "Sleep");
+        private static readonly string HibernateName = Lang.T("休眠", "Hibernate");
+        private static readonly string OtherName = Lang.T("其他", "Other");
 
         private const string KernelGeneral = "Microsoft-Windows-Kernel-General";
         private const string KernelPower = "Microsoft-Windows-Kernel-Power";
@@ -92,11 +97,11 @@ namespace PowerEventViewer
         {
             switch (c)
             {
-                case PowerCategory.Boot: return "開機";
-                case PowerCategory.Shutdown: return "關機";
-                case PowerCategory.Sleep: return "睡眠";
-                case PowerCategory.Hibernate: return "休眠";
-                default: return "其他";
+                case PowerCategory.Boot: return BootName;
+                case PowerCategory.Shutdown: return ShutdownName;
+                case PowerCategory.Sleep: return SleepName;
+                case PowerCategory.Hibernate: return HibernateName;
+                default: return OtherName;
             }
         }
 

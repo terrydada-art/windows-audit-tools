@@ -30,7 +30,7 @@ namespace AuditTools.Common
             string dir = Path.GetDirectoryName(fullPath);
             if (string.IsNullOrEmpty(dir))
             {
-                throw new IOException("無效的儲存路徑");
+                throw new IOException(Lang.T("無效的儲存路徑", "Invalid save path."));
             }
 
             // 先寫到同目錄的暫存檔 (CreateNew：不會覆蓋/跟隨既有檔案)，成功後再取代目標，

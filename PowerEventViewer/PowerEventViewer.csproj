@@ -35,8 +35,8 @@
     <Description>讀取 Windows 系統記錄檔的開機/關機/睡眠/休眠事件</Description>
     <Company>terrydada-art</Company>
     <Copyright>Copyright (C) 2026 terrydada-art. Licensed under GPL-3.0.</Copyright>
-    <Version>1.0.0</Version>
-    <FileVersion>1.0.0.0</FileVersion>
+    <Version>1.1.0</Version>
+    <FileVersion>1.1.0.0</FileVersion>
     <NeutralLanguage>zh-TW</NeutralLanguage>
   </PropertyGroup>
 

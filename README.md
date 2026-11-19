@@ -7,7 +7,7 @@
 ## 繁體中文
 
 兩個輕量的 Windows 事件記錄稽核小工具，C# + WinForms，目標 **.NET Framework 4.8**（Windows 10 1903+ / Windows 11 內建），
-不需要安裝任何執行階段或第三方套件，編譯後的 exe 只有約 35 KB，**未使用 UPX 等壓縮殼**，降低防毒軟體誤判。
+不需要安裝任何執行階段或第三方套件，編譯後的 exe 只有約 55 KB，**未使用 UPX 等壓縮殼**，降低防毒軟體誤判。
 
 | 工具 | 用途 | 權限 |
 |---|---|---|
@@ -15,6 +15,18 @@
 | **PowerEventViewer** | 讀取「系統」記錄檔的開機 / 關機 / 睡眠 / 休眠事件 | 一般使用者即可 |
 
 兩者皆可依日期區間篩選、隨時停止，並匯出 Excel (.xlsx)。
+
+### 介面語言
+
+支援繁體中文與英文：中文版 Windows 自動顯示中文，其他語言的 Windows 顯示英文。
+也可以用命令列參數強制指定（可放在捷徑的「目標」欄位）：
+
+```powershell
+PowerEventViewer.exe /lang:en   # 英文
+PowerEventViewer.exe /lang:zh   # 繁體中文
+```
+
+匯出的 Excel 欄位標題會跟著介面語言；事件說明欄則是 Windows 本身的語言。
 
 ### 下載
 
@@ -76,7 +88,7 @@ dotnet build windows-audit-tools.sln -c Release
 ```
 LoginAuditor/       登入稽核
 PowerEventViewer/   電源事件檢視器
-Shared/             共用：XlsxWriter (無相依 .xlsx 輸出)、TextSafety (不可信字串清理)、AppIcon
+Shared/             共用：XlsxWriter (無相依 .xlsx 輸出)、TextSafety (不可信字串清理)、Lang (中/英介面)、AppIcon
 tools/              make-icons.ps1：重新產生兩個程式的 app.ico (原創向量繪製)
 ```
 
@@ -90,7 +102,7 @@ tools/              make-icons.ps1：重新產生兩個程式的 app.ico (原創
 
 Two lightweight Windows event-log auditing tools written in C# + WinForms, targeting **.NET Framework 4.8**
 (built into Windows 10 1903+ / Windows 11). No runtime or third-party packages to install; each compiled exe is
-about 35 KB and is **not packed with UPX** or any other packer, which keeps antivirus false positives down.
+about 55 KB and is **not packed with UPX** or any other packer, which keeps antivirus false positives down.
 
 | Tool | Purpose | Privileges |
 |---|---|---|
@@ -99,7 +111,17 @@ about 35 KB and is **not packed with UPX** or any other packer, which keeps anti
 
 Both tools filter by date range, can be stopped at any time, and export to Excel (.xlsx).
 
-> The UI is in Traditional Chinese.
+### UI language
+
+English and Traditional Chinese are supported. The UI is shown in Chinese on Chinese Windows and in English on
+any other display language. You can force a language with a command-line switch (e.g. in a shortcut's Target field):
+
+```powershell
+PowerEventViewer.exe /lang:en   # English
+PowerEventViewer.exe /lang:zh   # Traditional Chinese
+```
+
+Exported Excel column headers follow the UI language; the event description column uses Windows' own language.
 
 ### Download
 
@@ -166,7 +188,7 @@ Pushing a `v*` tag makes GitHub Actions build and publish a release automaticall
 ```
 LoginAuditor/       Logon auditor
 PowerEventViewer/   Power event viewer
-Shared/             Shared code: XlsxWriter (dependency-free .xlsx writer), TextSafety (untrusted-text sanitizer), AppIcon
+Shared/             Shared code: XlsxWriter (dependency-free .xlsx writer), TextSafety (untrusted-text sanitizer), Lang (zh/en UI), AppIcon
 tools/              make-icons.ps1: regenerates both app.ico files (original vector drawings)
 ```
 

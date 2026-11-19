@@ -14,7 +14,9 @@ namespace LoginAuditor
         private static readonly Color RareColor = Color.FromArgb(0x80, 0x00, 0x80);
         private static readonly Color FailBackColor = Color.FromArgb(0xFF, 0xF0, 0xF0);
 
-        private static readonly string[] ExportHeaders = { "時間", "狀態", "帳號", "來源IP", "登入類型", "備註" };
+        private static readonly string[] ExportHeaders = Lang.IsChinese
+            ? new[] { "時間", "狀態", "帳號", "來源IP", "登入類型", "備註" }
+            : new[] { "Time", "Status", "Account", "Source IP", "Logon type", "Note" };
         private static readonly double[] ExportWidths = { 20, 8, 20, 18, 24, 18 };
 
         private readonly DateTimePicker _dtStart;
@@ -37,7 +39,7 @@ namespace LoginAuditor
             AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;
             Font = SystemFonts.MessageBoxFont;
-            Text = "Windows 登入稽核 (排除系統帳號 SYSTEM)";
+            Text = Lang.T("Windows 登入稽核 (排除系統帳號 SYSTEM)", "Windows Logon Auditor (SYSTEM accounts excluded)");
             ClientSize = new Size(1100, 700);
             MinimumSize = new Size(820, 400);
             StartPosition = FormStartPosition.CenterScreen;
@@ -46,18 +48,18 @@ namespace LoginAuditor
             _boldFont = new Font(Font, FontStyle.Bold);
 
             // ---- 1. 控制區 ----
-            var ctrlGroup = new GroupBox { Text = "篩選條件", Dock = DockStyle.Top, Height = 62, Padding = new Padding(8, 4, 8, 4) };
+            var ctrlGroup = new GroupBox { Text = Lang.T("篩選條件", "Filter"), Dock = DockStyle.Top, Height = 62, Padding = new Padding(8, 4, 8, 4) };
             var flow = new FlowLayoutPanel { Dock = DockStyle.Fill, WrapContents = false };
 
             _dtStart = MakePicker(DateTime.Today.AddDays(-7));
             _dtEnd = MakePicker(DateTime.Today);
-            _btnScan = MakeButton("開始分析", OnScanClick, true);
-            _btnStop = MakeButton("停止", OnStopClick, false);
-            _btnExport = MakeButton("匯出 Excel", OnExportClick, false);
+            _btnScan = MakeButton(Lang.T("開始分析", "Analyze"), OnScanClick, true);
+            _btnStop = MakeButton(Lang.T("停止", "Stop"), OnStopClick, false);
+            _btnExport = MakeButton(Lang.T("匯出 Excel", "Export to Excel"), OnExportClick, false);
 
-            flow.Controls.Add(MakeLabel("開始日期:", SystemColors.ControlText, false));
+            flow.Controls.Add(MakeLabel(Lang.T("開始日期:", "From:"), SystemColors.ControlText, false));
             flow.Controls.Add(_dtStart);
-            flow.Controls.Add(MakeLabel("結束日期:", SystemColors.ControlText, false));
+            flow.Controls.Add(MakeLabel(Lang.T("結束日期:", "To:"), SystemColors.ControlText, false));
             flow.Controls.Add(_dtEnd);
             flow.Controls.Add(new Label { BorderStyle = BorderStyle.Fixed3D, Width = 2, Height = 24, Anchor = AnchorStyles.Left, Margin = new Padding(10, 3, 10, 3) });
             flow.Controls.Add(_btnScan);
@@ -66,7 +68,7 @@ namespace LoginAuditor
 
             _status = new Label
             {
-                Text = "準備就緒",
+                Text = Lang.T("準備就緒", "Ready"),
                 ForeColor = Color.Blue,
                 Dock = DockStyle.Right,
                 Width = 380,
@@ -79,13 +81,13 @@ namespace LoginAuditor
 
             // ---- 2. 圖例 ----
             var legend = new FlowLayoutPanel { Dock = DockStyle.Top, Height = 26, Padding = new Padding(16, 2, 0, 0), WrapContents = false };
-            legend.Controls.Add(MakeLabel("圖例說明：", SystemColors.ControlText, false));
-            legend.Controls.Add(MakeLabel("■ 登入失敗 (警告)", Color.Red, false));
-            legend.Controls.Add(MakeLabel("■ 少數/異常帳號 (頻率<3%)", RareColor, true));
-            legend.Controls.Add(MakeLabel("■ 正常登入", SystemColors.ControlText, false));
+            legend.Controls.Add(MakeLabel(Lang.T("圖例說明：", "Legend:"), SystemColors.ControlText, false));
+            legend.Controls.Add(MakeLabel(Lang.T("■ 登入失敗 (警告)", "■ Failed logon (warning)"), Color.Red, false));
+            legend.Controls.Add(MakeLabel(Lang.T("■ 少數/異常帳號 (頻率<3%)", "■ Rare / suspicious account (frequency < 3%)"), RareColor, true));
+            legend.Controls.Add(MakeLabel(Lang.T("■ 正常登入", "■ Normal logon"), SystemColors.ControlText, false));
 
             // ---- 3. 結果列表 ----
-            var resultGroup = new GroupBox { Text = "分析結果 (已隱藏 SYSTEM 成功登入)", Dock = DockStyle.Fill, Padding = new Padding(10) };
+            var resultGroup = new GroupBox { Text = Lang.T("分析結果 (已隱藏 SYSTEM 成功登入)", "Results (successful SYSTEM logons hidden)"), Dock = DockStyle.Fill, Padding = new Padding(10) };
             _list = new ListView
             {
                 Dock = DockStyle.Fill,
@@ -96,12 +98,12 @@ namespace LoginAuditor
                 VirtualMode = true,
                 VirtualListSize = 0,
             };
-            _list.Columns.Add("時間", 140);
-            _list.Columns.Add("狀態", 70);
-            _list.Columns.Add("帳號名稱", 140);
-            _list.Columns.Add("來源 IP", 130);
-            _list.Columns.Add("登入類型", 180);
-            _list.Columns.Add("備註", 150);
+            _list.Columns.Add(Lang.T("時間", "Time"), 140);
+            _list.Columns.Add(Lang.T("狀態", "Status"), 70);
+            _list.Columns.Add(Lang.T("帳號名稱", "Account"), 140);
+            _list.Columns.Add(Lang.T("來源 IP", "Source IP"), 130);
+            _list.Columns.Add(Lang.T("登入類型", "Logon type"), 180);
+            _list.Columns.Add(Lang.T("備註", "Note"), 180);
             _list.RetrieveVirtualItem += OnRetrieveVirtualItem;
             resultGroup.Controls.Add(_list);
 
@@ -218,14 +220,15 @@ namespace LoginAuditor
             DateTime end = _dtEnd.Value.Date.AddDays(1).AddMilliseconds(-1); // 當天 23:59:59.999
             if (start > end)
             {
-                MessageBox.Show(this, "開始日期不能晚於結束日期", "日期錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(this, Lang.T("開始日期不能晚於結束日期", "The start date cannot be later than the end date."),
+                    Lang.T("日期錯誤", "Invalid date"), MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
             _list.VirtualListSize = 0;
             _records = new List<LogonRecord>();
             SetBusy(true, true);
-            SetStatus("正在讀取並過濾 SYSTEM 帳號...", Color.Blue);
+            SetStatus(Lang.T("正在讀取並過濾 SYSTEM 帳號...", "Reading events and filtering SYSTEM accounts..."), Color.Blue);
 
             var cts = new CancellationTokenSource();
             _cts = cts;
@@ -233,7 +236,8 @@ namespace LoginAuditor
             {
                 if (!IsDisposed && _busy)
                 {
-                    SetStatus(string.Format(CultureInfo.InvariantCulture, "已掃描: {0:N0} 筆 | 有效紀錄: {1:N0} 筆", p.Scanned, p.Kept), Color.Blue);
+                    SetStatus(string.Format(CultureInfo.InvariantCulture,
+                        Lang.T("已掃描: {0:N0} 筆 | 有效紀錄: {1:N0} 筆", "Scanned: {0:N0} | Kept: {1:N0}"), p.Scanned, p.Kept), Color.Blue);
                 }
             });
 
@@ -247,8 +251,8 @@ namespace LoginAuditor
                 if (!IsDisposed)
                 {
                     SetBusy(false, false);
-                    SetStatus("讀取失敗", Color.Red);
-                    MessageBox.Show(this, ex.Message, "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    SetStatus(Lang.T("讀取失敗", "Failed to read the event log"), Color.Red);
+                    MessageBox.Show(this, ex.Message, Lang.T("錯誤", "Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 return;
             }
@@ -272,18 +276,21 @@ namespace LoginAuditor
 
             if (_records.Count == 0)
             {
-                SetStatus(result.Cancelled ? "已停止，無資料" : "未發現在此期間的登入紀錄 (SYSTEM已過濾)", Color.Blue);
+                SetStatus(result.Cancelled
+                    ? Lang.T("已停止，無資料", "Stopped, no data")
+                    : Lang.T("未發現在此期間的登入紀錄 (SYSTEM已過濾)", "No logon records in this period (SYSTEM filtered)"), Color.Blue);
                 return;
             }
 
-            string msg = string.Format(CultureInfo.InvariantCulture, "分析完成，顯示 {0:N0} 筆紀錄", _records.Count);
+            string msg = string.Format(CultureInfo.InvariantCulture, Lang.T("分析完成，顯示 {0:N0} 筆紀錄", "Done, showing {0:N0} records"), _records.Count);
             if (result.Cancelled)
             {
-                msg += " (已停止，部分結果)";
+                msg += Lang.T(" (已停止，部分結果)", " (stopped, partial results)");
             }
             if (result.Truncated)
             {
-                msg += string.Format(CultureInfo.InvariantCulture, " (已達上限 {0:N0} 筆，請縮小日期範圍)", AuditScanner.MaxRecords);
+                msg += string.Format(CultureInfo.InvariantCulture,
+                    Lang.T(" (已達上限 {0:N0} 筆，請縮小日期範圍)", " (limit of {0:N0} reached, narrow the date range)"), AuditScanner.MaxRecords);
             }
             SetStatus(msg, result.Cancelled || result.Truncated ? Color.DarkOrange : Color.Green);
         }
@@ -295,7 +302,7 @@ namespace LoginAuditor
             {
                 cts.Cancel();
                 _btnStop.Enabled = false;
-                SetStatus("正在停止...", Color.Blue);
+                SetStatus(Lang.T("正在停止...", "Stopping..."), Color.Blue);
             }
         }
 
@@ -325,7 +332,7 @@ namespace LoginAuditor
             }
 
             SetBusy(true, false);
-            SetStatus("正在匯出...", Color.Blue);
+            SetStatus(Lang.T("正在匯出...", "Exporting..."), Color.Blue);
             try
             {
                 await Task.Run(() => XlsxWriter.Write(path, ExportHeaders, ExportWidths, ToRows(snapshot)));
@@ -334,8 +341,8 @@ namespace LoginAuditor
                     return;
                 }
                 SetBusy(false, false);
-                SetStatus(string.Format(CultureInfo.InvariantCulture, "匯出完成 ({0:N0} 筆)", snapshot.Count), Color.Green);
-                MessageBox.Show(this, "匯出完成", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                SetStatus(string.Format(CultureInfo.InvariantCulture, Lang.T("匯出完成 ({0:N0} 筆)", "Exported ({0:N0} records)"), snapshot.Count), Color.Green);
+                MessageBox.Show(this, Lang.T("匯出完成", "Export completed."), Lang.T("成功", "Success"), MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
@@ -344,8 +351,8 @@ namespace LoginAuditor
                     return;
                 }
                 SetBusy(false, false);
-                SetStatus("匯出失敗", Color.Red);
-                MessageBox.Show(this, ex.Message, "失敗", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                SetStatus(Lang.T("匯出失敗", "Export failed"), Color.Red);
+                MessageBox.Show(this, ex.Message, Lang.T("失敗", "Export failed"), MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

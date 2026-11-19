@@ -35,8 +35,8 @@
     <Description>讀取 Windows 安全性記錄檔 (4624/4625) 並標示登入失敗與少數帳號</Description>
     <Company>terrydada-art</Company>
     <Copyright>Copyright (C) 2026 terrydada-art. Licensed under GPL-3.0.</Copyright>
-    <Version>1.0.0</Version>
-    <FileVersion>1.0.0.0</FileVersion>
+    <Version>1.1.0</Version>
+    <FileVersion>1.1.0.0</FileVersion>
     <NeutralLanguage>zh-TW</NeutralLanguage>
   </PropertyGroup>
 

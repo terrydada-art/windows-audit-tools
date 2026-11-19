@@ -2,6 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
+using AuditTools.Common;
 
 namespace PowerEventViewer
 {
@@ -30,7 +31,7 @@ namespace PowerEventViewer
         private static void OnThreadException(object sender, ThreadExceptionEventArgs e)
         {
             // 只顯示訊息，不顯示堆疊 (避免把內部細節暴露給使用者畫面/截圖)
-            MessageBox.Show(e.Exception.Message, "未預期的錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(e.Exception.Message, Lang.T("未預期的錯誤", "Unexpected error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 }

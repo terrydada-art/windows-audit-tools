@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Threading;
 using System.Windows.Forms;
+using AuditTools.Common;
 
 namespace LoginAuditor
 {
@@ -28,7 +29,9 @@ namespace LoginAuditor
 
             if (!IsAdministrator())
             {
-                MessageBox.Show("請關閉程式，按右鍵選擇「以系統管理員身分執行」。", "權限不足",
+                MessageBox.Show(
+                    Lang.T("請關閉程式，按右鍵選擇「以系統管理員身分執行」。", "Please close the program, right-click it and choose \"Run as administrator\"."),
+                    Lang.T("權限不足", "Insufficient privileges"),
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
@@ -54,7 +57,7 @@ namespace LoginAuditor
         private static void OnThreadException(object sender, ThreadExceptionEventArgs e)
         {
             // 只顯示訊息，不顯示堆疊 (避免把內部細節暴露給使用者畫面/截圖)
-            MessageBox.Show(e.Exception.Message, "未預期的錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(e.Exception.Message, Lang.T("未預期的錯誤", "Unexpected error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 }

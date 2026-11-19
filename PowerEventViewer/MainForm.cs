@@ -16,7 +16,9 @@ namespace PowerEventViewer
         private static readonly Color SleepColor = Color.FromArgb(0xB8, 0x86, 0x0B);      // #B8860B
         private static readonly Color HibernateColor = Color.FromArgb(0x8B, 0x45, 0x13);  // #8B4513
 
-        private static readonly string[] ExportHeaders = { "時間", "事件類型", "事件ID", "來源", "記錄檔", "說明" };
+        private static readonly string[] ExportHeaders = Lang.IsChinese
+            ? new[] { "時間", "事件類型", "事件ID", "來源", "記錄檔", "說明" }
+            : new[] { "Time", "Category", "Event ID", "Source", "Log", "Description" };
         private static readonly double[] ExportWidths = { 20, 10, 8, 38, 10, 100 };
 
         private readonly DateTimePicker _dtStart;
@@ -42,29 +44,29 @@ namespace PowerEventViewer
             AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;
             Font = SystemFonts.MessageBoxFont;
-            Text = "Windows 電源事件檢視器";
-            ClientSize = new Size(1180, 720);
+            Text = Lang.T("Windows 電源事件檢視器", "Windows Power Event Viewer");
+            ClientSize = new Size(1260, 720);   // 英文介面的勾選框/按鈕較寬
             MinimumSize = new Size(900, 400);
             StartPosition = FormStartPosition.CenterScreen;
             AppIcon.Apply(this);
 
             // ---- 1. 控制區 ----
-            var ctrlGroup = new GroupBox { Text = "篩選條件", Dock = DockStyle.Top, Height = 62, Padding = new Padding(8, 4, 8, 4) };
+            var ctrlGroup = new GroupBox { Text = Lang.T("篩選條件", "Filter"), Dock = DockStyle.Top, Height = 62, Padding = new Padding(8, 4, 8, 4) };
             var flow = new FlowLayoutPanel { Dock = DockStyle.Fill, WrapContents = false };
 
             _dtStart = MakePicker(DateTime.Today.AddDays(-7));
             _dtEnd = MakePicker(DateTime.Today);
-            _chkBoot = MakeCheck("開機");
-            _chkShutdown = MakeCheck("關機");
-            _chkSleep = MakeCheck("睡眠");
-            _chkHibernate = MakeCheck("休眠");
-            _btnScan = MakeButton("開始分析", OnScanClick, true);
-            _btnStop = MakeButton("停止", OnStopClick, false);
-            _btnExport = MakeButton("匯出 Excel", OnExportClick, false);
+            _chkBoot = MakeCheck(PowerScanner.CategoryName(PowerCategory.Boot));
+            _chkShutdown = MakeCheck(PowerScanner.CategoryName(PowerCategory.Shutdown));
+            _chkSleep = MakeCheck(PowerScanner.CategoryName(PowerCategory.Sleep));
+            _chkHibernate = MakeCheck(PowerScanner.CategoryName(PowerCategory.Hibernate));
+            _btnScan = MakeButton(Lang.T("開始分析", "Analyze"), OnScanClick, true);
+            _btnStop = MakeButton(Lang.T("停止", "Stop"), OnStopClick, false);
+            _btnExport = MakeButton(Lang.T("匯出 Excel", "Export to Excel"), OnExportClick, false);
 
-            flow.Controls.Add(MakeLabel("開始日期:", SystemColors.ControlText));
+            flow.Controls.Add(MakeLabel(Lang.T("開始日期:", "From:"), SystemColors.ControlText));
             flow.Controls.Add(_dtStart);
-            flow.Controls.Add(MakeLabel("結束日期:", SystemColors.ControlText));
+            flow.Controls.Add(MakeLabel(Lang.T("結束日期:", "To:"), SystemColors.ControlText));
             flow.Controls.Add(_dtEnd);
             flow.Controls.Add(MakeSeparator());
             flow.Controls.Add(_chkBoot);
@@ -78,10 +80,10 @@ namespace PowerEventViewer
 
             _status = new Label
             {
-                Text = "準備就緒",
+                Text = Lang.T("準備就緒", "Ready"),
                 ForeColor = Color.Blue,
                 Dock = DockStyle.Right,
-                Width = 300,
+                Width = 280,
                 TextAlign = ContentAlignment.MiddleRight,
                 AutoEllipsis = true,
             };
@@ -91,14 +93,14 @@ namespace PowerEventViewer
 
             // ---- 2. 圖例 ----
             var legend = new FlowLayoutPanel { Dock = DockStyle.Top, Height = 26, Padding = new Padding(16, 2, 0, 0), WrapContents = false };
-            legend.Controls.Add(MakeLabel("圖例：", SystemColors.ControlText));
-            legend.Controls.Add(MakeLabel("■ 開機", BootColor));
-            legend.Controls.Add(MakeLabel("■ 關機", ShutdownColor));
-            legend.Controls.Add(MakeLabel("■ 睡眠", SleepColor));
-            legend.Controls.Add(MakeLabel("■ 休眠", HibernateColor));
+            legend.Controls.Add(MakeLabel(Lang.T("圖例：", "Legend:"), SystemColors.ControlText));
+            legend.Controls.Add(MakeLabel("■ " + PowerScanner.CategoryName(PowerCategory.Boot), BootColor));
+            legend.Controls.Add(MakeLabel("■ " + PowerScanner.CategoryName(PowerCategory.Shutdown), ShutdownColor));
+            legend.Controls.Add(MakeLabel("■ " + PowerScanner.CategoryName(PowerCategory.Sleep), SleepColor));
+            legend.Controls.Add(MakeLabel("■ " + PowerScanner.CategoryName(PowerCategory.Hibernate), HibernateColor));
 
             // ---- 3. 結果列表 ----
-            var resultGroup = new GroupBox { Text = "事件紀錄", Dock = DockStyle.Fill, Padding = new Padding(10) };
+            var resultGroup = new GroupBox { Text = Lang.T("事件紀錄", "Events"), Dock = DockStyle.Fill, Padding = new Padding(10) };
             _list = new ListView
             {
                 Dock = DockStyle.Fill,
@@ -110,12 +112,12 @@ namespace PowerEventViewer
                 VirtualListSize = 0,
                 ShowItemToolTips = true,
             };
-            _list.Columns.Add("時間", 140);
-            _list.Columns.Add("事件類型", 80);
-            _list.Columns.Add("事件 ID", 70, HorizontalAlignment.Center);
-            _list.Columns.Add("來源", 250);
-            _list.Columns.Add("記錄檔", 80, HorizontalAlignment.Center);
-            _list.Columns.Add("說明", 500);
+            _list.Columns.Add(Lang.T("時間", "Time"), 140);
+            _list.Columns.Add(Lang.T("事件類型", "Category"), 80);
+            _list.Columns.Add(Lang.T("事件 ID", "Event ID"), 70, HorizontalAlignment.Center);
+            _list.Columns.Add(Lang.T("來源", "Source"), 250);
+            _list.Columns.Add(Lang.T("記錄檔", "Log"), 80, HorizontalAlignment.Center);
+            _list.Columns.Add(Lang.T("說明", "Description"), 500);
             _list.RetrieveVirtualItem += OnRetrieveVirtualItem;
             resultGroup.Controls.Add(_list);
 
@@ -251,21 +253,23 @@ namespace PowerEventViewer
             DateTime end = _dtEnd.Value.Date.AddDays(1).AddMilliseconds(-1); // 當天 23:59:59.999
             if (start > end)
             {
-                MessageBox.Show(this, "開始日期不能晚於結束日期。", "日期錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(this, Lang.T("開始日期不能晚於結束日期。", "The start date cannot be later than the end date."),
+                    Lang.T("日期錯誤", "Invalid date"), MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
             PowerCategory selected = SelectedCategories();
             if (selected == PowerCategory.None)
             {
-                MessageBox.Show(this, "請至少勾選一種事件類型。", "篩選錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(this, Lang.T("請至少勾選一種事件類型。", "Please select at least one event category."),
+                    Lang.T("篩選錯誤", "Invalid filter"), MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
             _list.VirtualListSize = 0;
             _records = new List<PowerRecord>();
             SetBusy(true, true);
-            SetStatus("正在讀取事件記錄...", Color.Blue);
+            SetStatus(Lang.T("正在讀取事件記錄...", "Reading the event log..."), Color.Blue);
 
             var cts = new CancellationTokenSource();
             _cts = cts;
@@ -273,7 +277,8 @@ namespace PowerEventViewer
             {
                 if (!IsDisposed && _busy)
                 {
-                    SetStatus(string.Format(CultureInfo.InvariantCulture, "已掃描 {0:N0} 筆，符合條件 {1:N0} 筆", p.Scanned, p.Kept), Color.Blue);
+                    SetStatus(string.Format(CultureInfo.InvariantCulture,
+                        Lang.T("已掃描 {0:N0} 筆，符合條件 {1:N0} 筆", "Scanned {0:N0}, matched {1:N0}"), p.Scanned, p.Kept), Color.Blue);
                 }
             });
 
@@ -287,8 +292,9 @@ namespace PowerEventViewer
                 if (!IsDisposed)
                 {
                     SetBusy(false, false);
-                    SetStatus("讀取 " + PowerScanner.LogName + " 記錄檔失敗", Color.Red);
-                    MessageBox.Show(this, ex.Message, "錯誤", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    SetStatus(string.Format(CultureInfo.InvariantCulture,
+                        Lang.T("讀取 {0} 記錄檔失敗", "Failed to read the {0} log"), PowerScanner.LogName), Color.Red);
+                    MessageBox.Show(this, ex.Message, Lang.T("錯誤", "Error"), MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 return;
             }
@@ -312,18 +318,20 @@ namespace PowerEventViewer
 
             if (_records.Count == 0)
             {
-                SetStatus(result.Cancelled ? "已停止，無資料" : "分析完成，查無符合條件的事件", Color.Blue);
+                SetStatus(result.Cancelled
+                    ? Lang.T("已停止，無資料", "Stopped, no data")
+                    : Lang.T("分析完成，查無符合條件的事件", "Done, no matching events"), Color.Blue);
                 return;
             }
 
-            string msg = string.Format(CultureInfo.InvariantCulture, "分析完成，共顯示 {0:N0} 筆事件", _records.Count);
+            string msg = string.Format(CultureInfo.InvariantCulture, Lang.T("分析完成，共顯示 {0:N0} 筆事件", "Done, showing {0:N0} events"), _records.Count);
             if (result.Cancelled)
             {
-                msg += " (已停止，部分結果)";
+                msg += Lang.T(" (已停止，部分結果)", " (stopped, partial results)");
             }
             if (result.Truncated)
             {
-                msg += string.Format(CultureInfo.InvariantCulture, " (已達上限 {0:N0} 筆)", PowerScanner.MaxRecords);
+                msg += string.Format(CultureInfo.InvariantCulture, Lang.T(" (已達上限 {0:N0} 筆)", " (limit of {0:N0} reached)"), PowerScanner.MaxRecords);
             }
             SetStatus(msg, result.Cancelled || result.Truncated ? Color.DarkOrange : Color.Green);
         }
@@ -335,7 +343,7 @@ namespace PowerEventViewer
             {
                 cts.Cancel();
                 _btnStop.Enabled = false;
-                SetStatus("正在停止...", Color.Blue);
+                SetStatus(Lang.T("正在停止...", "Stopping..."), Color.Blue);
             }
         }
 
@@ -350,7 +358,7 @@ namespace PowerEventViewer
             string path;
             using (var dlg = new SaveFileDialog
             {
-                Title = "另存為 Excel",
+                Title = Lang.T("另存為 Excel", "Save as Excel"),
                 Filter = "Excel Files (*.xlsx)|*.xlsx",
                 DefaultExt = "xlsx",
                 AddExtension = true,
@@ -366,7 +374,7 @@ namespace PowerEventViewer
             }
 
             SetBusy(true, false);
-            SetStatus("正在匯出...", Color.Blue);
+            SetStatus(Lang.T("正在匯出...", "Exporting..."), Color.Blue);
             try
             {
                 await Task.Run(() => XlsxWriter.Write(path, ExportHeaders, ExportWidths, ToRows(snapshot)));
@@ -375,8 +383,8 @@ namespace PowerEventViewer
                     return;
                 }
                 SetBusy(false, false);
-                SetStatus(string.Format(CultureInfo.InvariantCulture, "匯出完成 ({0:N0} 筆)", snapshot.Count), Color.Green);
-                MessageBox.Show(this, "Excel 匯出完成。", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                SetStatus(string.Format(CultureInfo.InvariantCulture, Lang.T("匯出完成 ({0:N0} 筆)", "Exported ({0:N0} records)"), snapshot.Count), Color.Green);
+                MessageBox.Show(this, Lang.T("Excel 匯出完成。", "Excel export completed."), Lang.T("成功", "Success"), MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
@@ -385,8 +393,8 @@ namespace PowerEventViewer
                     return;
                 }
                 SetBusy(false, false);
-                SetStatus("匯出失敗", Color.Red);
-                MessageBox.Show(this, ex.Message, "匯出失敗", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                SetStatus(Lang.T("匯出失敗", "Export failed"), Color.Red);
+                MessageBox.Show(this, ex.Message, Lang.T("匯出失敗", "Export failed"), MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
