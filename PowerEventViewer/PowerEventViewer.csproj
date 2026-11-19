@@ -12,6 +12,7 @@
     <AssemblyName>PowerEventViewer</AssemblyName>
     <RootNamespace>PowerEventViewer</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>app.ico</ApplicationIcon>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
 

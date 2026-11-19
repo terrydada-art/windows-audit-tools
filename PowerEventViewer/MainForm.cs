@@ -46,6 +46,7 @@ namespace PowerEventViewer
             ClientSize = new Size(1180, 720);
             MinimumSize = new Size(900, 400);
             StartPosition = FormStartPosition.CenterScreen;
+            AppIcon.Apply(this);
 
             // ---- 1. 控制區 ----
             var ctrlGroup = new GroupBox { Text = "篩選條件", Dock = DockStyle.Top, Height = 62, Padding = new Padding(8, 4, 8, 4) };

@@ -41,6 +41,7 @@ namespace LoginAuditor
             ClientSize = new Size(1100, 700);
             MinimumSize = new Size(820, 400);
             StartPosition = FormStartPosition.CenterScreen;
+            AppIcon.Apply(this);
 
             _boldFont = new Font(Font, FontStyle.Bold);
 

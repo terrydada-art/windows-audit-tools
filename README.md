@@ -76,7 +76,8 @@ dotnet build windows-audit-tools.sln -c Release
 ```
 LoginAuditor/       登入稽核
 PowerEventViewer/   電源事件檢視器
-Shared/             共用：XlsxWriter (無相依 .xlsx 輸出)、TextSafety (不可信字串清理)
+Shared/             共用：XlsxWriter (無相依 .xlsx 輸出)、TextSafety (不可信字串清理)、AppIcon
+tools/              make-icons.ps1：重新產生兩個程式的 app.ico (原創向量繪製)
 ```
 
 ### 授權
@@ -165,7 +166,8 @@ Pushing a `v*` tag makes GitHub Actions build and publish a release automaticall
 ```
 LoginAuditor/       Logon auditor
 PowerEventViewer/   Power event viewer
-Shared/             Shared code: XlsxWriter (dependency-free .xlsx writer), TextSafety (untrusted-text sanitizer)
+Shared/             Shared code: XlsxWriter (dependency-free .xlsx writer), TextSafety (untrusted-text sanitizer), AppIcon
+tools/              make-icons.ps1: regenerates both app.ico files (original vector drawings)
 ```
 
 ### License
