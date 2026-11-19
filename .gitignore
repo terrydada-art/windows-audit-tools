@@ -1,0 +1,12 @@
+# 建置輸出
+bin/
+obj/
+*.user
+.vs/
+
+# 原始 Python 版本不公開
+/*.py
+__pycache__/
+
+# 測試匯出檔
+*.xlsx

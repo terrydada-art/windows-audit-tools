@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    目標 .NET Framework 4.8：Windows 10 1903+ / Windows 11 內建，不需另外安裝執行階段，
+    因此編譯出的 exe 只有數十 KB，且不需任何壓縮殼 (UPX)。
+  -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>LoginAuditor</AssemblyName>
+    <RootNamespace>LoginAuditor</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+
+    <!-- 縮小輸出：不產生 pdb / xml 文件 / 衛星資源 -->
+    <Optimize>true</Optimize>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <SatelliteResourceLanguages>none</SatelliteResourceLanguages>
+    <Deterministic>true</Deterministic>
+
+    <!-- 安全相關編譯選項 -->
+    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+    <!-- 完整版本資訊：可降低防毒軟體對「無資訊執行檔」的啟發式誤判 -->
+    <Product>Windows Login Auditor</Product>
+    <AssemblyTitle>Windows 登入稽核</AssemblyTitle>
+    <Description>讀取 Windows 安全性記錄檔 (4624/4625) 並標示登入失敗與少數帳號</Description>
+    <Company>terrydada-art</Company>
+    <Copyright>Copyright (C) 2026 terrydada-art. Licensed under GPL-3.0.</Copyright>
+    <Version>1.0.0</Version>
+    <FileVersion>1.0.0.0</FileVersion>
+    <NeutralLanguage>zh-TW</NeutralLanguage>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="System.IO.Compression" />
+    <Compile Include="..\Shared\*.cs" LinkBase="Shared" />
+  </ItemGroup>
+
+</Project>
